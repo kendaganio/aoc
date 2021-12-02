@@ -23,14 +23,17 @@
 (setf (gethash 'aim hash) 0)
 
 (defun adjust-pos (coords value)
-  (case (char (car (split-str value " ")) 0)
+  (defparameter splitted (split-str value " "))
+  (defparameter command (char (car splitted) 0))
+  (defparameter units (parse-integer (car (cdr splitted))))
+  (case command
     (#\f (progn
-     (setf (gethash 'x coords) (+ (gethash 'x coords) (parse-integer (car (cdr (split-str value " "))))))
+     (setf (gethash 'x coords) (+ (gethash 'x coords) units))
      (setf (gethash 'y coords) 
            (+ (gethash 'y coords)
-           (* (gethash 'aim coords) (parse-integer (car (cdr (split-str value " ")))))))))
-    (#\d (setf (gethash 'aim coords) (+ (gethash 'aim coords) (parse-integer (car (cdr (split-str value " ")))))))
-    (#\u (setf (gethash 'aim coords) (- (gethash 'aim coords) (parse-integer (car (cdr (split-str value " "))))))))
+           (* (gethash 'aim coords) units)))))
+    (#\d (setf (gethash 'aim coords) (+ (gethash 'aim coords) units)))
+    (#\u (setf (gethash 'aim coords) (- (gethash 'aim coords) units))))
   (identity coords))
 
 (defvar pos (reduce 'adjust-pos input :initial-value hash))
