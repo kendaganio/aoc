@@ -85,9 +85,7 @@
                  (terpri)))
              (if (check-win card)
                (progn
-                 (setf cards (remove card cards))
-                 (format t "~a cards left" (length cards))
-                 (terpri))))))
+                 (setf cards (remove card cards)))))))
 
-(part2 (parse-input "in.txt"))
-(part1 (parse-input "in.txt"))
+(part2 (parse-input "./in.txt"))
+(part1 (parse-input "./in.txt"))

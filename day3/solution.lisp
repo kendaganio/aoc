@@ -37,8 +37,8 @@
 
 (defun find-oxygen-rating (input)
   (defun num-in-idx-eq (updated-input binary num idx)
-    (defparameter bit (if (>= num (/ (length updated-input) 2)) 1 0))
-    (eq (parse-integer (string (char binary idx))) bit))
+    (defparameter bitt (if (>= num (/ (length updated-input) 2)) 1 0))
+    (eq (parse-integer (string (char binary idx))) bitt))
   (loop for index from 0 to 11
         do 
         (defparameter max-bits (reduce #'add-in-place (mapcar #'to-nums input)))
@@ -49,8 +49,8 @@
 
 (defun find-co2-rating (input)
   (defun num-in-idx-eq (updated-input binary num idx)
-    (defparameter bit (if (>= num (/ (length updated-input) 2)) 0 1))
-    (eq (parse-integer (string (char binary idx))) bit))
+    (defparameter bitt (if (>= num (/ (length updated-input) 2)) 0 1))
+    (eq (parse-integer (string (char binary idx))) bitt))
   (loop for index from 0 to 11
         do 
         (defparameter max-bits (reduce #'add-in-place (mapcar #'to-nums input)))
