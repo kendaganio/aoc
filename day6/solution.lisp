@@ -7,8 +7,7 @@
 (defun tick (lst)
   (let ((spawned (loop for e in lst count (eq 0 e))))
     (setf lst (append lst (make-list spawned :initial-element 9)))
-    (loop for e in lst collect (if (eq 0 e) 6 (1- e))
-        )))
+    (loop for e in lst collect (if (eq 0 e) 6 (1- e)))))
 
 ; memo
 (defvar memo (make-hash-table :test 'equalp))
@@ -25,14 +24,13 @@
 
 (defun solve2 (input days)
   (let ((fishes (copy-seq input)) (count-all 0))
-    (loop for fish in fishes do
-          (incf count-all (spawn-count fish days)))
+    (loop for fish in fishes do (incf count-all (spawn-count fish days)))
     (format t "part2 fishes ~a~%" count-all)))
 
 (defun solve1 (input days)
   (let ((fishes (copy-seq input)))
-    (loop for i from 0 below days do
-          (setf fishes (tick fishes)))
+    (loop for i from 0 below days do (setf fishes (tick fishes)))
     (format t "part1 fishes ~a~%" (length fishes))))
 
+(time (solve1 (parse-input "./in.txt") 80))
 (time (solve2 (parse-input "./in.txt") 256))
