@@ -17,17 +17,17 @@
       (return-from safe-aref 10)
       (return-from safe-aref (aref grid i j)))))
 
+(defun is-low-point (input val i j) 
+  (every #'identity (loop for (dx dy) in '((-1 0) (1 0) (0 -1) (0 1)) 
+                          collect (< val (safe-aref input (+ i dx) (+ j dy))))))
+
 (defun solve1 (input)
   (let ((low-points (list '())))
     (destructuring-bind (n m) (array-dimensions input)
       (loop for i from 0 below n do
             (loop for j from 0 below m do 
                   (let ((val (aref input i j)))
-                    (if (and 
-                          (< val (safe-aref input (1+ i) j)) 
-                          (< val (safe-aref input (1- i) j)) 
-                          (< val (safe-aref input i (1+ j))) 
-                          (< val (safe-aref input i (1- j))))
+                    (if (is-low-point input val i j) 
                       (push val (car low-points)))))))
     (+ (length (car low-points)) (reduce #'+ (car low-points)))))
 
@@ -46,25 +46,14 @@
 
     (return-from find-basin nodes)))
 
-(defun count-visited (grid)
-  (destructuring-bind (n m) (array-dimensions grid)
-    (loop for i from 0 below n 
-          sum (loop for j from 0 below m count (= 99 (aref grid i j))))))
-
 (defun solve2 (input)
   (let ((basins (list '())))
     (destructuring-bind (n m) (array-dimensions input)
       (loop for i from 0 below n do
             (loop for j from 0 below m do 
                   (let ((val (aref input i j)))
-                    (if (and 
-                          (< val (safe-aref input (1+ i) j)) 
-                          (< val (safe-aref input (1- i) j)) 
-                          (< val (safe-aref input i (1+ j))) 
-                          (< val (safe-aref input i (1- j))))
-                      (push (find-basin (parse-input "./in.txt") i j) (car basins))
-                      ;(push (count-visited (find-basin (parse-input "./in.txt") i j)) (car basins))
-                      )))))
+                    (if (is-low-point input val i j) 
+                      (push (find-basin (parse-input "./in.txt") i j) (car basins)))))))
     (setf sorted (sort (car basins) #'>))
     (* (car sorted) (cadr sorted) (caddr sorted))))
 
