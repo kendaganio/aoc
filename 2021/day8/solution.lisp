@@ -16,22 +16,27 @@
           while line
           collect (parse-line line))))
 
+;;; begin part 1
 (defun one-p (segment)
   (equal (length segment) 2))
+
 (defun four-p (segment)
   (equal (length segment) 4))
+
 (defun seven-p (segment)
   (equal (length segment) 3))
+
 (defun eight-p (segment)
   (equal (length segment) 7))
 
-(defun lol (segment)
+(defun is-1-4-7-8 (segment)
   (or (one-p segment) (four-p segment) (seven-p segment) (eight-p segment)))
 
 (defun solve1 (segments)
   (loop for line in segments
-        sum (count 't (mapcar #'lol (cadr line)))))
+        sum (count 't (mapcar #'is-1-4-7-8 (cadr line)))))
 
+;;; begin part 2
 (defun sort-by-length (line)
   (mapcar #'sort-chars (sort line (lambda (a b) (< (length a) (length b))))))
 
@@ -88,7 +93,7 @@
     (setf zero (concatenate 'string (subtract-str eight (concatenate 'string (list (nth 6 bits))))))
     (setf six (concatenate 'string (subtract-str eight (concatenate 'string (list (nth 1 bits))))))
 
-    (defvar decoder (make-hash-table :test 'equal))
+    (setf decoder (make-hash-table :test 'equal))
     (setf (gethash (sort-chars zero) decoder) "0")
     (setf (gethash (sort-chars one) decoder) "1")
     (setf (gethash (sort-chars two) decoder) "2")
@@ -103,8 +108,7 @@
     (return-from do-the-thing (parse-integer (format nil "~{~a~^~}" (loop for s in to-decode collect (gethash (sort-chars s) decoder)))))))
 
 (defun solve2 (segments)
-  (loop for line in segments sum (do-the-thing line))
-  )
+  (loop for line in segments sum (do-the-thing line)))
 
 (time (format t "[PART1]: ~a" (solve1 (parse-input "./in.txt"))))
 (time (format t "[PART2]: ~a" (solve2 (parse-input "./in.txt"))))
