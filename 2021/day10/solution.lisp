@@ -46,7 +46,7 @@
 (defun find-incomplete (lines)
   (loop for line in lines when (equal 0 (walk line)) collect line))
 
-(defun find-missing-closers (line &aux (stack nil) (score 0))
+(defun close-and-score (line &aux (stack nil) (score 0))
   (loop for ch in line do
         (if (find ch openers :test 'equal)
           (setf stack (cons ch stack))
@@ -55,8 +55,8 @@
   (loop for s in stack do (setf score (+ (* score 5) (gethash s part2-scores))))
   (identity score))
 
-(defun solve2 (input)
-  (setf scores (sort (mapcar #'find-missing-closers (find-incomplete input)) #'>))
+(defun solve2 (input &aux (scores nil))
+  (setf scores (sort (mapcar #'close-and-score (find-incomplete input)) #'>))
   (nth (/ (- (length scores) 1) 2) scores))
   
 
