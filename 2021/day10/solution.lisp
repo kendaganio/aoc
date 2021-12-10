@@ -35,10 +35,10 @@
   (loop for ch in line do
         (if (find ch openers :test 'equal)
           (setf stack (cons ch stack))
-            (if (equal (gethash (car stack) pairs) ch) 
-              (setf stack (cdr stack))
-              (return-from walk (gethash ch part1-scores)))))
-    (return-from walk 0))
+          (if (equal (gethash (car stack) pairs) ch) 
+            (setf stack (cdr stack))
+            (return-from walk (gethash ch part1-scores)))))
+  (return-from walk 0))
 
 (defun solve1 (input)
   (loop for line in input sum (walk line)))
