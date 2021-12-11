@@ -28,20 +28,20 @@
           (if (> (aref grid (+ i dx) (+ j dy)) 9) (flash grid (+ i dx) (+ j dy)))))
 
 (defun tick (input)
-    (destructuring-bind (n m) (array-dimensions input)
-      (loop for i from 0 below n do
-            (loop for j from 0 below m do 
-                  (incf (aref input i j))
-                  (if (> (aref input i j) 9) (flash input i j)))))
-    (identity input))
+  (destructuring-bind (n m) (array-dimensions input)
+    (loop for i from 0 below n do
+          (loop for j from 0 below m do 
+                (incf (aref input i j))
+                (if (> (aref input i j) 9) (flash input i j)))))
+  (identity input))
 
 (defun cleanup (input)
-    (destructuring-bind (n m) (array-dimensions input)
-      (loop for i from 0 below n do
-            (loop for j from 0 below m 
-                  when (< (aref input i j) 0) do
-                    (setf (aref input i j) 0))))
-    (identity input))
+  (destructuring-bind (n m) (array-dimensions input)
+    (loop for i from 0 below n do
+          (loop for j from 0 below m 
+                when (< (aref input i j) 0) do
+                (setf (aref input i j) 0))))
+  (identity input))
 
 (defun solve1 (input &aux (steps 100))
   (loop for i from 0 below steps do
