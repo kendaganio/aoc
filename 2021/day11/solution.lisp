@@ -22,11 +22,10 @@
 (defun flash (grid i j)
   (incf flash-count)
   (setf (aref grid i j) -1000)
-  (loop for (dx dy) in '((-1 0) (1 0) (0 -1) (0 1) (1 1) (1 -1) (-1 1) (-1 -1)) do 
-    (if (safe-aref grid (+ i dx) (+ j dy)) 
-      (progn
-        (incf (aref grid (+ i dx) (+ j dy)))
-        (if (> (aref grid (+ i dx) (+ j dy)) 9) (flash grid (+ i dx) (+ j dy)))))))
+  (loop for (dx dy) in '((-1 0) (1 0) (0 -1) (0 1) (1 1) (1 -1) (-1 1) (-1 -1)) 
+        when (safe-aref grid (+ i dx) (+ j dy)) do
+          (incf (aref grid (+ i dx) (+ j dy)))
+          (if (> (aref grid (+ i dx) (+ j dy)) 9) (flash grid (+ i dx) (+ j dy)))))
 
 (defun tick (input)
     (destructuring-bind (n m) (array-dimensions input)
@@ -39,8 +38,9 @@
 (defun cleanup (input)
     (destructuring-bind (n m) (array-dimensions input)
       (loop for i from 0 below n do
-            (loop for j from 0 below m do 
-                  (if (< (aref input i j) 0) (setf (aref input i j) 0)))))
+            (loop for j from 0 below m 
+                  when (< (aref input i j) 0) do
+                    (setf (aref input i j) 0))))
     (identity input))
 
 (defun solve1 (input &aux (steps 100))
@@ -59,7 +59,7 @@
   (loop for i from 1 below 999999999 do
         (setf input (cleanup (tick input)))
         (if (is-mega-flash input)
-        (return-from solve2 i))))
+          (return-from solve2 i))))
 
 (time (format t "[PART1]: ~a" (solve1 (parse-input "./in.txt"))))
 (time (format t "[PART2]: ~a" (solve2 (parse-input "./in.txt"))))
