@@ -34,8 +34,7 @@
           collect (parse-line line))))
   (cons
     (make-array (list (length lines) (length (car lines))) :initial-contents lines)
-    (make-array (list (length lines) (length (car lines))) :initial-element 99)
-  ))
+    (make-array (list (length lines) (length (car lines))) :initial-element 99)))
 
 (defun parse-input2 (filename &aux (lines nil))
   (with-open-file (stream filename)
@@ -51,7 +50,6 @@
   (+ (abs (- x i)) (abs (- y j))))
 
 (defun djikstra (grid scores &aux queue x y (visited (make-hash-table :test 'equalp)))
-  ; set-up queue with 0,0
   (setf queue (cons (list 0 0 0 0) queue))
 
   (destructuring-bind (n m) (array-dimensions grid)
@@ -78,6 +76,7 @@
                                                (+ score (aref grid (+ i dx) (+ j dy)))
                                                (+ score (aref grid (+ i dx) (+ j dy))  (manhattan X Y (+ i dx) (+ j dy))))
                                          queue)))
+              ; rip lisp for not having a prio queue
               (setf queue (sort queue #'< :key #'cadddr))))))
   (aref scores X Y))
 
