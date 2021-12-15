@@ -6,49 +6,83 @@
       (return-from safe-aref nil)
       (return-from safe-aref (aref grid i j)))))
 
+(defun wot (n)
+  (if (= n 9) 1 (1+ n)))
+
+(defun x5 (line &aux next)
+  (setf next line)
+  (dotimes (i 4)
+    (setf next (mapcar #'wot next))
+    (setf line (concatenate 'list line next)))
+  (identity line))
+
+(defun y5 (lines &aux next)
+  (setf next lines)
+  (dotimes (i 4)
+    (setf next (loop for line in next 
+                     collect (mapcar #'wot line)))
+    (setf lines (concatenate 'list lines next)))
+  (identity lines))
+
 (defun parse-line (line)
   (mapcar 'parse-integer (mapcar #'string (concatenate 'list line))))
-
-(defvar lowest-score 99999)
-
-(defun traverse (grid i j visited &aux current-score)
-  (setf visited (cons (list i j) visited))
-  (setf current-score (- (loop for k in visited sum (aref grid (car k) (cadr k))) (aref grid 0 0)))
-
-  (if (>= current-score lowest-score)
-    (return-from traverse nil))
-
-  ;(format t "i: ~a j: ~a~%" i j)
-  ;(format t "v: ~a~%" visited)
-  ;(terpri)
-
-  ; stop if end point
-  (destructuring-bind (n m) (array-dimensions grid)
-    (if (find (list (1- n) (1- m)) visited :test 'equal)
-      (progn
-        (if (< current-score lowest-score)
-          (setf lowest-score current-score))
-        (return-from traverse nil))
-    )
-  )
-
-  (loop for (dx dy) in '((-1 0) (1 0) (0 -1) (0 1)) ;(1 1) (1 -1) (-1 1) (-1 -1)) 
-        when (and 
-               (safe-aref grid (+ i dx) (+ j dy))
-               (not (find (list (+ i dx) (+ j dy)) visited :test 'equal))
-                  ) do
-        (traverse grid (+ i dx) (+ j dy) (copy-seq visited))))
 
 (defun parse-input (filename &aux (lines nil))
   (with-open-file (stream filename)
     (setf lines (loop for line = (read-line stream nil)
           while line
           collect (parse-line line))))
-  (make-array (list (length lines) (length (car lines))) :initial-contents lines))
+  (cons
+    (make-array (list (length lines) (length (car lines))) :initial-contents lines)
+    (make-array (list (length lines) (length (car lines))) :initial-element 99)
+  ))
+
+(defun parse-input2 (filename &aux (lines nil))
+  (with-open-file (stream filename)
+    (setf lines (loop for line = (read-line stream nil)
+          while line
+          collect (x5 (parse-line line)))))
+  (setf lines (y5 lines))
+  (cons
+    (make-array (list (length lines) (length (car lines))) :initial-contents lines)
+    (make-array (list (length lines) (length (car lines))) :initial-element 99)))
+
+(defun manhattan (x y i j)
+  (+ (abs (- x i)) (abs (- y j))))
+
+(defun djikstra (grid scores &aux queue x y (visited (make-hash-table :test 'equalp)))
+  ; set-up queue with 0,0
+  (setf queue (cons (list 0 0 0 0) queue))
+
+  (destructuring-bind (n m) (array-dimensions grid)
+    (setf x (1- n))
+    (setf y (1- m)))
+
+  (loop while (> (length queue) 0) do
+        (destructuring-bind (i j score h) (pop queue)
+          ;(format t "i: ~a j: ~a q: ~a~%" i j (length queue))
+          (if (not (gethash (list i j) visited))
+            (progn
+              (setf (gethash (list i j) visited) 't)
+              (setf (aref scores i j) score)
+
+              (if (and (= i x) (= j y))
+                (return-from djikstra (aref scores X Y)))
+
+              (loop for (dx dy) in '((0 1) (1 0) (0 -1) (-1 0)) 
+                    when (and 
+                           (safe-aref grid (+ i dx) (+ j dy))
+                           (not (gethash (list (+ i dx) (+ j dy)) visited))) 
+                    do (setf queue (cons (list (+ i dx) 
+                                               (+ j dy)
+                                               (+ score (aref grid (+ i dx) (+ j dy)))
+                                               (+ score (aref grid (+ i dx) (+ j dy))  (manhattan X Y (+ i dx) (+ j dy))))
+                                         queue)))
+              (setf queue (sort queue #'< :key #'cadddr))))))
+  (aref scores X Y))
 
 (defun solve1 (input &aux out)
-  (traverse input 0 0 nil)
-  (identity lowest-score))
+  (djikstra (car input) (cdr input)))
 
-(time (format t "[PART1]: ~a" (solve1 (parse-input "./example.txt"))))
-;(time (format t "[PART2]: ~a" (solve1 (parse-input "./in.txt") 40)))
+(time (format t "[PART1]: ~a" (solve1 (parse-input "./in.txt"))))
+(time (format t "[PART2]: ~a" (solve1 (parse-input2 "./in.txt"))))
