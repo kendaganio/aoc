@@ -41,17 +41,14 @@ impl Hand {
         match (self, other) {
             (Hand::Paper, Hand::Rock) => Result::Win,
             (Hand::Paper, Hand::Scissors) => Result::Lose,
-            (Hand::Paper, Hand::Paper) => Result::Draw,
 
-            (Hand::Rock, Hand::Rock) => Result::Draw,
             (Hand::Rock, Hand::Scissors) => Result::Win,
             (Hand::Rock, Hand::Paper) => Result::Lose,
 
             (Hand::Scissors, Hand::Rock) => Result::Lose,
-            (Hand::Scissors, Hand::Scissors) => Result::Draw,
             (Hand::Scissors, Hand::Paper) => Result::Win,
 
-            _ => Result::Lose,
+            _ => Result::Draw,
         }
     }
 
