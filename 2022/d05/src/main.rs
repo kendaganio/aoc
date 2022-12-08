@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::fs;
+use std::time::Instant;
 
 #[derive(Debug)]
 pub struct Command {
@@ -52,6 +53,7 @@ pub fn solve_part2(stacks: &HashMap<usize, Vec<char>>, commands: &Vec<Command>) 
 }
 
 fn main() {
+    let now = Instant::now();
     let mut stacks: HashMap<usize, Vec<char>> = HashMap::new();
     let file = fs::read_to_string("./src/in.txt").expect("!!");
     let lines = file.lines();
@@ -86,6 +88,14 @@ fn main() {
         })
         .collect();
 
-    println!("Part 1: {}", solve_part1(&stacks, &commands));
-    println!("Part 1: {}", solve_part2(&stacks, &commands));
+    println!(
+        "Part 1: {} | t: {:.2?}",
+        solve_part1(&stacks, &commands),
+        now.elapsed()
+    );
+    println!(
+        "Part 1: {} | t: {:.2?}",
+        solve_part2(&stacks, &commands),
+        now.elapsed()
+    );
 }
