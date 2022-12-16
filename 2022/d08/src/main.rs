@@ -10,7 +10,7 @@ pub fn is_visible(
 ) -> bool {
     let initial = at.clone();
     let og = trees[&initial];
-    let (mut x, mut y) = initial;
+    let (mut x, mut y) = at.clone();
 
     y += 1;
     while let Some(new_value) = trees.get(&(x, y)) {
