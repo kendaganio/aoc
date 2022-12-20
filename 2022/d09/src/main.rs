@@ -98,15 +98,17 @@ pub fn solve_part2(actions: &Vec<Action>) -> i32 {
 }
 
 fn main() {
-    let now = Instant::now();
     let input = fs::read_to_string("./src/in.txt").expect("!");
     let directions: Vec<Action> = input.trim_end().lines().map(Action::parse).collect();
 
+    let mut now = Instant::now();
     println!(
         "Part 1: {} | t: {:.2?}",
         solve_part1(&directions),
         now.elapsed()
     );
+
+    now = Instant::now();
     println!(
         "Part 2: {} | t: {:.2?}",
         solve_part2(&directions),

@@ -1,4 +1,5 @@
 use std::fs;
+use std::time::Instant;
 
 fn solve_part1(input: &Vec<i32>) -> i32 {
     *input.last().unwrap()
@@ -9,6 +10,7 @@ fn solve_part2(input: &Vec<i32>) -> i32 {
 }
 
 fn main() {
+    let now = Instant::now();
     let input = fs::read_to_string("./src/in.txt").expect("no!");
     let elves: Vec<Vec<i32>> = input
         .split("\n\n")
@@ -23,6 +25,15 @@ fn main() {
     let mut calories: Vec<i32> = elves.iter().map(|elf| elf.iter().sum()).collect();
     calories.sort_unstable();
 
-    println!("Part 1: {}", solve_part1(&calories));
-    println!("Part 1: {}", solve_part2(&calories));
+    println!(
+        "Part 1: {} | t: {:.2?}",
+        solve_part1(&calories),
+        now.elapsed()
+    );
+
+    println!(
+        "Part 2: {} | t: {:.2?}",
+        solve_part2(&calories),
+        now.elapsed()
+    );
 }
