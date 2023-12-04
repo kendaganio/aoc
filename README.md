@@ -1,1 +1,5 @@
-# kswzl's attempt at AoC 2021
+# Advent of Code
+
+- 2021: Common Lisp
+- 2022: Rust
+- 2023: Go 2021
