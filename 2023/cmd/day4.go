@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func SolveD4P1(lines []string) {
+func SolveD4(lines []string) (int, int) {
 	points := 0
 	cards := []int{}
 	wins := make(map[int]int)
@@ -56,8 +56,7 @@ func SolveD4P1(lines []string) {
 		i++
 	}
 
-	fmt.Println("Part 1:", points)
-	fmt.Println("Part 2:", len(cards))
+	return points, len(cards)
 }
 
 var day4Cmd = &cobra.Command{
@@ -67,7 +66,9 @@ var day4Cmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		lines := magic.Lines(args[0])
 
-		SolveD4P1(lines)
+		part1, part2 := SolveD4(lines)
+		fmt.Println("Part 1:", part1)
+		fmt.Println("Part 2:", part2)
 	},
 }
 

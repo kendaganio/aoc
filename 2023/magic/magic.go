@@ -2,8 +2,17 @@ package magic
 
 import (
 	"os"
+	"strconv"
 	"strings"
 )
+
+func ParseInt(s string) (i int) {
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		panic("not a number")
+	}
+	return
+}
 
 func Lines(filePath string) []string {
 	bytes, err := os.ReadFile(filePath)
@@ -13,6 +22,15 @@ func Lines(filePath string) []string {
 
 	lines := strings.Split(string(bytes), "\n")
 	return lines[:len(lines)-1]
+}
+
+func Read(filePath string) string {
+	bytes, err := os.ReadFile(filePath)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(bytes)
 }
 
 func Border(lines []string, borderChar string) []string {
