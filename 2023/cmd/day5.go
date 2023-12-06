@@ -4,20 +4,61 @@ import (
 	"fmt"
 	"math"
 	"strings"
+	"time"
 
 	"github.com/kendaganio/aoc/2023/magic"
 	"github.com/spf13/cobra"
 )
 
-type Range struct {
-	start int
-	items int
-}
-
 type Map struct {
 	dst int
 	src int
 	rng int
+}
+
+type Range struct {
+	Start int
+	End   int
+}
+
+func (a Range) Overlaps(b Range) bool {
+	return math.Max(float64(a.End), float64(b.End))-math.Min(float64(a.Start), float64(b.Start)) < (float64(a.End)-float64(a.Start))+(float64(b.End)-float64(b.Start))
+}
+
+func (a Range) Intersection(b Range) Range {
+	return Range{
+		Start: int(math.Max(float64(a.Start), float64(b.Start))),
+		End:   int(math.Min(float64(a.End), float64(b.End))),
+	}
+
+}
+
+type Mapper struct {
+	Range  Range
+	Offset int
+}
+
+type Step struct {
+	Mappers []Mapper
+}
+
+func (s Step) Convert(r Range) (out Range) {
+	out = r
+
+	for _, mapper := range s.Mappers {
+		if mapper.Range.Overlaps(r) {
+			out = r.Intersection(mapper.Range)
+			out.Start += mapper.Offset
+			out.End += mapper.Offset
+			break
+		}
+	}
+
+	return
+}
+
+func (m Mapper) Convert(i int) int {
+	return i + m.Offset
 }
 
 func (m Map) Convert(v int) int {
@@ -26,11 +67,6 @@ func (m Map) Convert(v int) int {
 	} else {
 		return v
 	}
-}
-
-func (m Map) HasValuesInRange(r Range) bool {
-	// return m.src+m.rng >= r.start || m.src <= r.start+r.rng
-	return true
 }
 
 func FindConvertedValue(maps []Map, v int) int {
@@ -62,61 +98,64 @@ func ParseMapping(raw string) (maps []Map) {
 	return
 }
 
-func SolveD5P1(seeds []int, maps [][]Map) int {
+func NewStep(raw string) (step Step) {
+	nums := strings.Split(raw, ":")[1]
+	lines := strings.Split(strings.TrimSpace(nums), "\n")
+
+	for _, line := range lines {
+		split := strings.Fields(line)
+		dst := magic.ParseInt(string(split[0]))
+		src := magic.ParseInt(string(split[1]))
+		rng := magic.ParseInt(string(split[2]))
+
+		step.Mappers = append(step.Mappers, Mapper{
+			Range: Range{
+				Start: src,
+				End:   src + rng,
+			},
+			Offset: dst - src,
+		})
+	}
+
+	return
+}
+
+func SolveD5P1(seeds []int, steps []Step) {
+	start := time.Now()
 	lowest := math.MaxInt
 
 	for _, s := range seeds {
-		convertedValue := s
-		for _, m := range maps {
-			convertedValue = FindConvertedValue(m, convertedValue)
+		convertedRange := Range{Start: s, End: s + 1}
+
+		for _, step := range steps {
+			convertedRange = step.Convert(convertedRange)
 		}
 
-		if convertedValue < lowest {
-			lowest = convertedValue
+		if lowest > convertedRange.Start {
+			lowest = convertedRange.Start
 		}
 	}
 
-	return lowest
+	fmt.Println("Part 1:", lowest, time.Since(start))
 }
 
-func SolveD5P2(seeds []int, maps [][]Map) int {
-	lowsPerRange := make(chan int)
-
-	seedRanges := []Range{}
-	for i := 0; i < len(seeds); i += 2 {
-		seedRanges = append(seedRanges, Range{start: seeds[i], items: seeds[i+1]})
-	}
+func SolveD5P2(seedRanges []Range, steps []Step) {
+	start := time.Now()
+	lowest := math.MaxInt
 
 	for _, sr := range seedRanges {
-		go func(sr Range) {
-			lowest := math.MaxInt
-			// fmt.Println("start:", sr)
+		convertedRange := sr
 
-			for s := sr.start; s < sr.start+sr.items; s++ {
-				convertedValue := s
-				for _, ms := range maps {
-					convertedValue = FindConvertedValue(ms, convertedValue)
-				}
+		for _, step := range steps {
+			convertedRange = step.Convert(convertedRange)
+		}
 
-				if convertedValue < lowest {
-					lowest = convertedValue
-				}
-			}
-
-			// fmt.Println("end:", sr, lowest)
-			lowsPerRange <- lowest
-		}(sr)
-	}
-
-	lowest := math.MaxInt
-	for range seedRanges {
-		lowInRange := <-lowsPerRange
-		if lowInRange < lowest {
-			lowest = lowInRange
+		if lowest > convertedRange.Start {
+			lowest = convertedRange.Start
 		}
 	}
 
-	return lowest
+	fmt.Println("Part 2:", lowest, time.Since(start))
 }
 
 var day5Cmd = &cobra.Command{
@@ -133,14 +172,18 @@ var day5Cmd = &cobra.Command{
 			seeds = append(seeds, magic.ParseInt(seedString))
 		}
 
-		maps := [][]Map{}
+		steps := []Step{}
 		for _, raw := range split[1:] {
-			maps = append(maps, ParseMapping(raw))
+			steps = append(steps, NewStep(raw))
 		}
 
-		fmt.Println("Part 1:", SolveD5P1(seeds, maps))
-		fmt.Println("This part is slow, around ~5 mins")
-		fmt.Println("Part 2:", SolveD5P2(seeds, maps))
+		seedRanges := []Range{}
+		for i := 0; i < len(seeds); i += 2 {
+			seedRanges = append(seedRanges, Range{Start: seeds[i], End: seeds[i] + seeds[i+1] - 1})
+		}
+
+		SolveD5P1(seeds, steps)
+		SolveD5P2(seedRanges, steps)
 	},
 }
 
