@@ -23,9 +23,6 @@ func SolveD6P1(lines []string) {
 
 		for e := 1; e < t; e++ {
 			distanceTraveled := e * (t - e)
-			if i == 1 {
-				fmt.Println(distanceTraveled, targetDistance)
-			}
 			if distanceTraveled > targetDistance {
 				wins++
 			}
