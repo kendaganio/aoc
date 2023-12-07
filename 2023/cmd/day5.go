@@ -10,12 +10,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type Map struct {
-	dst int
-	src int
-	rng int
-}
-
 type Range struct {
 	Start int
 	End   int
@@ -38,64 +32,12 @@ type Mapper struct {
 	Offset int
 }
 
-type Step struct {
-	Mappers []Mapper
-}
-
-func (s Step) Convert(r Range) (out Range) {
-	out = r
-
-	for _, mapper := range s.Mappers {
-		if mapper.Range.Overlaps(r) {
-			out = r.Intersection(mapper.Range)
-			out.Start += mapper.Offset
-			out.End += mapper.Offset
-			break
-		}
-	}
-
-	return
-}
-
 func (m Mapper) Convert(i int) int {
 	return i + m.Offset
 }
 
-func (m Map) Convert(v int) int {
-	if v >= m.src && v < m.src+m.rng {
-		return m.dst + (v - m.src)
-	} else {
-		return v
-	}
-}
-
-func FindConvertedValue(maps []Map, v int) int {
-	for _, m := range maps {
-		newV := m.Convert(v)
-		if newV != v {
-			return newV
-		}
-	}
-
-	return v
-}
-
-func ParseMapping(raw string) (maps []Map) {
-	nums := strings.Split(raw, ":")[1]
-	lines := strings.Split(strings.TrimSpace(nums), "\n")
-
-	maps = []Map{}
-
-	for _, line := range lines {
-		split := strings.Fields(line)
-		maps = append(maps, Map{
-			dst: magic.ParseInt(string(split[0])),
-			src: magic.ParseInt(string(split[1])),
-			rng: magic.ParseInt(string(split[2])),
-		})
-	}
-
-	return
+type Step struct {
+	Mappers []Mapper
 }
 
 func NewStep(raw string) (step Step) {
@@ -115,6 +57,21 @@ func NewStep(raw string) (step Step) {
 			},
 			Offset: dst - src,
 		})
+	}
+
+	return
+}
+
+func (s Step) Convert(r Range) (out Range) {
+	out = r
+
+	for _, mapper := range s.Mappers {
+		if mapper.Range.Overlaps(r) {
+			out = r.Intersection(mapper.Range)
+			out.Start += mapper.Offset
+			out.End += mapper.Offset
+			break
+		}
 	}
 
 	return
