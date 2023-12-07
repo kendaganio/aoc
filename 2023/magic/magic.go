@@ -14,6 +14,20 @@ func ParseInt(s string) (i int) {
 	return
 }
 
+func MaxValueIn[K comparable, V int](m map[K]V) (K, V) {
+	var chosen K
+	var maxOcc V
+
+	for k, v := range m {
+		if v > maxOcc {
+			maxOcc = v
+			chosen = k
+		}
+	}
+
+	return chosen, maxOcc
+}
+
 func Lines(filePath string) []string {
 	bytes, err := os.ReadFile(filePath)
 	if err != nil {

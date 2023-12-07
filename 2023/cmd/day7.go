@@ -22,87 +22,74 @@ const (
 	FiveOfAKind
 )
 
-type Strength int
+type Rank int
 
-func (s Strength) String() string {
+func (s Rank) String() string {
 	return [...]string{
 		"Butaw", "Pair", "TwoPair", "Trio", "FullHouse", "Quad", "FiveOfAKind",
 	}[s-1]
 }
 
 type Hand struct {
-	Cards    string
-	Strength Strength
-	Bet      int
+	Cards string
+	Rank  Rank
+	Bet   int
 }
 
 func NewHand(line string, withJokers bool) Hand {
 	parts := strings.Split(line, " ")
 
 	return Hand{
-		Cards:    parts[0],
-		Bet:      magic.ParseInt(parts[1]),
-		Strength: getHandStrength(parts[0], withJokers),
+		Cards: parts[0],
+		Rank:  getHandRank(parts[0], withJokers),
+		Bet:   magic.ParseInt(parts[1]),
 	}
 }
 
-func getHandStrength(cards string, withJokers bool) Strength {
-	groupedCards := make(map[string]int)
+func getHandRank(cards string, withJokers bool) (rank Rank) {
+	groupedCards := make(map[rune]int)
 	jokers := 0
-
-	if withJokers && cards == "JJJJJ" {
-		return FiveOfAKind
-	}
 
 	for _, card := range cards {
 		if withJokers && card == 'J' {
 			jokers++
 		} else {
-			groupedCards[string(card)]++
+			groupedCards[card]++
 		}
 	}
 
 	if jokers > 0 {
-		var chosenKey string
-		maxOcc := 0
-
-		for k, v := range groupedCards {
-			if v > maxOcc {
-				maxOcc = v
-				chosenKey = k
-			}
-		}
-
-		groupedCards[chosenKey] += jokers
+		k, _ := magic.MaxValueIn(groupedCards)
+		groupedCards[k] += jokers
 	}
 
 	switch len(groupedCards) {
-	case 5: // butaw
-		return Butaw
-	case 4: // one pair
-		return Pair
-	case 1: // five
-		return FiveOfAKind
-	case 3: // two pair & trio
+	case 5:
+		rank = Butaw
+	case 4:
+		rank = Pair
+	case 3:
 		var v []int = maps.Values(groupedCards)
 		if slices.Contains(v, 3) {
-			return Trio
+			rank = Trio
 		} else {
-			return TwoPair
+			rank = TwoPair
 		}
-	case 2: // full & quad
+	case 2:
 		var v []int = maps.Values(groupedCards)
 		if slices.Contains(v, 4) {
-			return Quad
+			rank = Quad
 		} else {
-			return FullHouse
+			rank = FullHouse
 		}
+	case 1, 0:
+		rank = FiveOfAKind
 	}
 
-	return Butaw
+	return rank
 }
 
-func CompareIndividualCards(ranks string, a rune, b rune) int {
+func compareCards(ranks string, a rune, b rune) int {
 	if a == b {
 		return 0
 	}
@@ -110,11 +97,11 @@ func CompareIndividualCards(ranks string, a rune, b rune) int {
 	return strings.IndexRune(ranks, a) - strings.IndexRune(ranks, b)
 }
 
-func GetComparerFunc(ranks string) func(a Hand, b Hand) int {
+func getComparerFunc(ranks string) func(a Hand, b Hand) int {
 	return func(a Hand, b Hand) int {
-		if a.Strength == b.Strength {
+		if a.Rank == b.Rank {
 			for i := range a.Cards {
-				if cardCmp := CompareIndividualCards(ranks, rune(a.Cards[i]), rune(b.Cards[i])); cardCmp == 0 {
+				if cardCmp := compareCards(ranks, rune(a.Cards[i]), rune(b.Cards[i])); cardCmp == 0 {
 					continue
 				} else {
 					return cardCmp
@@ -122,7 +109,7 @@ func GetComparerFunc(ranks string) func(a Hand, b Hand) int {
 			}
 		}
 
-		return int(a.Strength - b.Strength)
+		return int(a.Rank - b.Rank)
 	}
 }
 
@@ -135,7 +122,7 @@ func SolveD7P1(lines []string) {
 		hands = append(hands, NewHand(line, false))
 	}
 
-	slices.SortFunc(hands, GetComparerFunc("23456789TJQKA"))
+	slices.SortFunc(hands, getComparerFunc("23456789TJQKA"))
 
 	for i, h := range hands {
 		winnings += (1 + i) * h.Bet
@@ -153,7 +140,7 @@ func SolveD7P2(lines []string) {
 		hands = append(hands, NewHand(line, true))
 	}
 
-	slices.SortFunc(hands, GetComparerFunc("J23456789TQKA"))
+	slices.SortFunc(hands, getComparerFunc("J23456789TQKA"))
 
 	for i, h := range hands {
 		winnings += (1 + i) * h.Bet
