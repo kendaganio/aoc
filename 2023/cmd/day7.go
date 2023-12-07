@@ -126,9 +126,14 @@ func GetComparerFunc(ranks string) func(a Hand, b Hand) int {
 	}
 }
 
-func SolveD7P1(hands []Hand) {
+func SolveD7P1(lines []string) {
 	start := time.Now()
+	hands := []Hand{}
 	winnings := 0
+
+	for _, line := range lines {
+		hands = append(hands, NewHand(line, false))
+	}
 
 	slices.SortFunc(hands, GetComparerFunc("23456789TJQKA"))
 
@@ -139,9 +144,14 @@ func SolveD7P1(hands []Hand) {
 	fmt.Println("Part 1:", winnings, time.Since(start))
 }
 
-func SolveD7P2(hands []Hand) {
+func SolveD7P2(lines []string) {
 	start := time.Now()
+	hands := []Hand{}
 	winnings := 0
+
+	for _, line := range lines {
+		hands = append(hands, NewHand(line, true))
+	}
 
 	slices.SortFunc(hands, GetComparerFunc("J23456789TQKA"))
 
@@ -159,13 +169,8 @@ var day7Cmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		lines := magic.Lines(args[0])
 
-		hands := []Hand{}
-		for _, line := range lines {
-			hands = append(hands, NewHand(line, true))
-		}
-
-		SolveD7P1(hands)
-		SolveD7P2(hands)
+		SolveD7P1(lines)
+		SolveD7P2(lines)
 	},
 }
 
