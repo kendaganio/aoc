@@ -14,6 +14,17 @@ func ParseInt(s string) (i int) {
 	return
 }
 
+func SplitAndParseInt(s string, sep string) []int {
+	out := []int{}
+	split := strings.Split(s, sep)
+
+	for _, part := range split {
+		out = append(out, ParseInt(part))
+	}
+
+	return out
+}
+
 func MaxValueIn[K comparable, V int](m map[K]V) (K, V) {
 	var chosen K
 	var maxOcc V

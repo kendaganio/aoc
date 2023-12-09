@@ -24,7 +24,6 @@ func (a Range) Intersection(b Range) Range {
 		Start: int(math.Max(float64(a.Start), float64(b.Start))),
 		End:   int(math.Min(float64(a.End), float64(b.End))),
 	}
-
 }
 
 type Mapper struct {

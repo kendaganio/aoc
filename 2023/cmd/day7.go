@@ -113,8 +113,7 @@ func getComparerFunc(ranks string) func(a Hand, b Hand) int {
 	}
 }
 
-func SolveD7P1(lines []string) {
-	start := time.Now()
+func SolveD7P1(lines []string) int {
 	hands := []Hand{}
 	winnings := 0
 
@@ -128,11 +127,10 @@ func SolveD7P1(lines []string) {
 		winnings += (1 + i) * h.Bet
 	}
 
-	fmt.Println("Part 1:", winnings, time.Since(start))
+	return winnings
 }
 
-func SolveD7P2(lines []string) {
-	start := time.Now()
+func SolveD7P2(lines []string) int {
 	hands := []Hand{}
 	winnings := 0
 
@@ -146,7 +144,8 @@ func SolveD7P2(lines []string) {
 		winnings += (1 + i) * h.Bet
 	}
 
-	fmt.Println("Part 2:", winnings, time.Since(start))
+	return winnings
+
 }
 
 var day7Cmd = &cobra.Command{
@@ -156,8 +155,11 @@ var day7Cmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		lines := magic.Lines(args[0])
 
-		SolveD7P1(lines)
-		SolveD7P2(lines)
+		start := time.Now()
+		fmt.Println("Part 1:", SolveD7P1(lines), time.Since(start))
+
+		start = time.Now()
+		fmt.Println("Part 2:", SolveD7P2(lines), time.Since(start))
 	},
 }
 
