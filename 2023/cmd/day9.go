@@ -44,22 +44,18 @@ func getPrevValue(nums []int) int {
 	}
 }
 
-func SolveD9P1(lines []string) int {
-	total := 0
-
+func SolveD9P1(lines []string) (total int) {
 	for _, line := range lines {
-		nums := magic.SplitAndParseInt(line, " ")
+		nums := magic.SplitToInts(line, " ")
 		total += getNextValue(nums)
 	}
 
 	return total
 }
 
-func SolveD9P2(lines []string) int {
-	total := 0
-
+func SolveD9P2(lines []string) (total int) {
 	for _, line := range lines {
-		nums := magic.SplitAndParseInt(line, " ")
+		nums := magic.SplitToInts(line, " ")
 		total += getPrevValue(nums)
 	}
 

@@ -14,7 +14,7 @@ func ParseInt(s string) (i int) {
 	return
 }
 
-func SplitAndParseInt(s string, sep string) []int {
+func SplitToInts(s string, sep string) []int {
 	out := []int{}
 	split := strings.Split(s, sep)
 
