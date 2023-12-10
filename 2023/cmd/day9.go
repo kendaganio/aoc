@@ -44,19 +44,17 @@ func getPrevValue(nums []int) int {
 	}
 }
 
-func SolveD9P1(lines []string) (total int) {
-	for _, line := range lines {
-		nums := magic.SplitToInts(line, " ")
-		total += getNextValue(nums)
+func SolveD9P1(seqs [][]int) (total int) {
+	for _, seq := range seqs {
+		total += getNextValue(seq)
 	}
 
 	return total
 }
 
-func SolveD9P2(lines []string) (total int) {
-	for _, line := range lines {
-		nums := magic.SplitToInts(line, " ")
-		total += getPrevValue(nums)
+func SolveD9P2(seqs [][]int) (total int) {
+	for _, seq := range seqs {
+		total += getPrevValue(seq)
 	}
 
 	return total
@@ -69,11 +67,16 @@ var day9Cmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		lines := magic.Lines(args[0])
 
+		nums := [][]int{}
+		for _, line := range lines {
+			nums = append(nums, magic.SplitToInts(line, " "))
+		}
+
 		start := time.Now()
-		fmt.Println("Part 1:", SolveD9P1(lines), time.Since(start))
+		fmt.Println("Part 1:", SolveD9P1(nums), time.Since(start))
 
 		start = time.Now()
-		fmt.Println("Part 2:", SolveD9P2(lines), time.Since(start))
+		fmt.Println("Part 2:", SolveD9P2(nums), time.Since(start))
 	},
 }
 
