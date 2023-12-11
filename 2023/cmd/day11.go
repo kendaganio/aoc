@@ -9,11 +9,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type Galaxy struct {
-	X int
-	Y int
-}
-
 func computeWeights(lines []string, inc int) [][]int {
 	out := make([][]int, len(lines))
 
@@ -51,13 +46,10 @@ func computeWeights(lines []string, inc int) [][]int {
 	return out
 }
 
-func djikstra(weights [][]int, src Galaxy) map[Point]int {
+func djikstra(weights [][]int, src Point) map[Point]int {
 	visited := make(map[Point]bool)
-	dist := make(map[Point]int)
-
-	srcPoint := Point{src.X, src.Y}
-	q := []Point{srcPoint}
-	dist[srcPoint] = 0
+	dist := map[Point]int{src: 0}
+	q := []Point{src}
 
 	for len(q) != 0 {
 		node := q[0]
@@ -93,7 +85,7 @@ func djikstra(weights [][]int, src Galaxy) map[Point]int {
 	return dist
 }
 
-func SolveD11P1(weights [][]int, galaxies []Galaxy) (total int) {
+func SolveD11P1(weights [][]int, galaxies []Point) (total int) {
 	for i, f := range galaxies {
 		dists := djikstra(weights, f)
 		for _, s := range galaxies[i+1:] {
@@ -113,12 +105,11 @@ var day11Cmd = &cobra.Command{
 		weights := computeWeights(lines, 2)
 		weights2 := computeWeights(lines, 1_000_000)
 
-		galaxies := []Galaxy{}
-
+		galaxies := []Point{}
 		for y, line := range lines {
 			for x, r := range line {
 				if r != '.' {
-					galaxies = append(galaxies, Galaxy{x, y})
+					galaxies = append(galaxies, Point{x, y})
 				}
 			}
 		}
