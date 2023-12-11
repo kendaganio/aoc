@@ -16,14 +16,15 @@ type Point struct {
 	Y int
 }
 
-func traverse(grid []string, scores map[Point]int, start Point, step int) {
+func traverse(grid []string, scores *map[Point]int, start Point, step int) {
 	node := rune(grid[start.Y][start.X])
 
-	if (scores[start] > 0 && step > 1) || node == '.' {
+	if ((*scores)[start] > 0 && step > 1) || node == '.' {
 		return
 	}
 
-	scores[start] = step
+	(*scores)[start] = step
+
 	u := Point{start.X, start.Y - 1}
 	d := Point{start.X, start.Y + 1}
 	l := Point{start.X - 1, start.Y}
@@ -54,17 +55,15 @@ func traverse(grid []string, scores map[Point]int, start Point, step int) {
 		traverse(grid, scores, d, step+1)
 		traverse(grid, scores, l, step+1)
 	}
-
 }
 
-func SolveD10P1(grid []string, start Point) (total int, _ map[Point]int) {
+func SolveD10P1(grid []string, start Point) (int, map[Point]int) {
 	scores := make(map[Point]int)
 	scores[start] = 1
-	traverse(grid, scores, start, 1)
 
-	maxValue := slices.Max(maps.Values(scores))
+	traverse(grid, &scores, start, 1)
 
-	return maxValue / 2, scores
+	return slices.Max(maps.Values(scores)) / 2, scores
 }
 
 func SolveD10P2(grid []string, scores map[Point]int) (total int) {
