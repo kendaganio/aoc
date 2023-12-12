@@ -81,7 +81,6 @@ func djikstra(weights [][]int, src Point) map[Point]int {
 
 		visited[node] = true
 	}
-
 	return dist
 }
 
