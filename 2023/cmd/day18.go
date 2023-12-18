@@ -88,9 +88,10 @@ func Shoelace(pts []Point) (det int) {
 
 func PickInterior(b int, area int) int {
 	// A = i + (b / 2) - 1
-	//   A: area
-	//   i: count interior points
-	//   b: count boundary points
+	//
+	//	A: area
+	//	i: count interior points
+	//	b: count boundary points
 	return area - (b / 2) + 1
 }
 
