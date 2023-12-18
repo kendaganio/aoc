@@ -19,6 +19,7 @@ const (
 	Down
 	Left
 	Right
+	Unknown
 )
 
 func travel(d Direction, p Point, grid map[Point]rune, visited map[Point]map[Direction]bool) {
