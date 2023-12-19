@@ -10,10 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type Comp int
+type Op int
 
 const (
-	Gt Comp = iota
+	Gt Op = iota
 	Lt
 )
 
@@ -60,15 +60,15 @@ func (w Workflow) Run(key string, p Part) string {
 
 	for _, rule := range rules {
 		if rule.r == -1 {
-			return rule.dst
+			return rule.next
 		}
 
-		if rule.comp == Gt && p[rule.l] > rule.r {
-			return rule.dst
+		if rule.op == Gt && p[rule.l] > rule.r {
+			return rule.next
 		}
 
-		if rule.comp == Lt && p[rule.l] < rule.r {
-			return rule.dst
+		if rule.op == Lt && p[rule.l] < rule.r {
+			return rule.next
 		}
 	}
 
@@ -77,9 +77,9 @@ func (w Workflow) Run(key string, p Part) string {
 
 type Rule struct {
 	l    int
-	comp Comp
+	op   Op
 	r    int
-	dst  string
+	next string
 }
 
 func NewRule(s string) Rule {
@@ -100,9 +100,9 @@ func NewRule(s string) Rule {
 
 	return Rule{
 		l:    aa[found[2]],
-		comp: comp,
+		op:   comp,
 		r:    magic.ParseIntWithDefault(found[4], -1),
-		dst:  found[5],
+		next: found[5],
 	}
 }
 
@@ -144,19 +144,19 @@ func RunRange(name string, wf Workflow, rp PartRange) []PartRange {
 		in := nextRange
 
 		if rule.r == -1 {
-			return append(valid, RunRange(rule.dst, wf, nextRange)...)
+			return append(valid, RunRange(rule.next, wf, nextRange)...)
 		}
 
-		if rule.comp == Gt && nextRange[rule.l].End > rule.r {
+		if rule.op == Gt && nextRange[rule.l].End > rule.r {
 			in[rule.l].Start = rule.r + 1
 			nextRange[rule.l].End = rule.r
-			valid = append(valid, RunRange(rule.dst, wf, in)...)
+			valid = append(valid, RunRange(rule.next, wf, in)...)
 		}
 
-		if rule.comp == Lt && nextRange[rule.l].End > rule.r {
+		if rule.op == Lt && nextRange[rule.l].End > rule.r {
 			in[rule.l].End = rule.r - 1
 			nextRange[rule.l].Start = rule.r
-			valid = append(valid, RunRange(rule.dst, wf, in)...)
+			valid = append(valid, RunRange(rule.next, wf, in)...)
 		}
 	}
 
