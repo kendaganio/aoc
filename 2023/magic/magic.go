@@ -14,6 +14,14 @@ func ParseInt(s string) (i int) {
 	return
 }
 
+func ParseIntWithDefault(s string, d int) (i int) {
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		i = d
+	}
+	return
+}
+
 func SplitToInts(s string, sep string) []int {
 	out := []int{}
 	split := strings.Split(s, sep)

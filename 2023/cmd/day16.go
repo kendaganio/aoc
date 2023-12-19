@@ -15,7 +15,7 @@ func (d Direction) String() string {
 }
 
 const (
-	Up = iota + 1
+	Up Direction = iota + 1
 	Down
 	Left
 	Right
