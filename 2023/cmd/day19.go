@@ -107,30 +107,21 @@ func NewRule(s string) Rule {
 }
 
 func SolveD19P1(wf Workflow, parts []Part) (total int) {
-	a := []Part{}
-	r := []Part{}
-
 	for _, part := range parts {
 		currentWorkflow := "in"
 
 		for {
-			next := wf.Run(currentWorkflow, part)
-			currentWorkflow = next
+			currentWorkflow = wf.Run(currentWorkflow, part)
 
 			if currentWorkflow == "A" {
-				a = append(a, part)
+				total += part[0] + part[1] + part[2] + part[3]
 				break
 			}
 
 			if currentWorkflow == "R" {
-				r = append(r, part)
 				break
 			}
 		}
-	}
-
-	for _, part := range a {
-		total += part[0] + part[1] + part[2] + part[3]
 	}
 
 	return total
@@ -171,6 +162,7 @@ func RunRange(name string, wf Workflow, rp PartRange) []PartRange {
 
 	return valid
 }
+
 func SolveD19P2(wf Workflow) (total int) {
 	rp := PartRange{
 		{Start: 1, End: 4000},
@@ -180,6 +172,7 @@ func SolveD19P2(wf Workflow) (total int) {
 	}
 
 	count := RunRange("in", wf, rp)
+
 	for _, c := range count {
 		total += (c[0].End - c[0].Start + 1) *
 			(c[1].End - c[1].Start + 1) *
