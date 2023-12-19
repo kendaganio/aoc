@@ -10,10 +10,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type Op int
+type Operator int
 
 const (
-	Gt Op = iota
+	Null Operator = iota
+	Gt
 	Lt
 )
 
@@ -59,7 +60,7 @@ func (w Workflow) Run(key string, p Part) string {
 	}
 
 	for _, rule := range rules {
-		if rule.r == -1 {
+		if rule.op == Null {
 			return rule.next
 		}
 
@@ -77,8 +78,8 @@ func (w Workflow) Run(key string, p Part) string {
 
 type Rule struct {
 	l    int
-	op   Op
 	r    int
+	op   Operator
 	next string
 }
 
@@ -86,9 +87,12 @@ func NewRule(s string) Rule {
 	m := regexp.MustCompile(`((x|m|a|s)?(>|<)?(\d*)?\:)?(\w+)`)
 	found := m.FindStringSubmatch(s)
 
-	comp := Gt
+	comp := Null
 	if found[3] == "<" {
 		comp = Lt
+	}
+	if found[3] == ">" {
+		comp = Gt
 	}
 
 	aa := map[string]int{
@@ -143,7 +147,7 @@ func RunRange(name string, wf Workflow, rp PartRange) []PartRange {
 	for _, rule := range rules {
 		in := nextRange
 
-		if rule.r == -1 {
+		if rule.op == Null {
 			return append(valid, RunRange(rule.next, wf, nextRange)...)
 		}
 
