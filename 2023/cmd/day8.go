@@ -34,7 +34,7 @@ func SolveD8P1(moves string, network map[string][]string) {
 	fmt.Println("Part 1:", steps, time.Since(start))
 }
 
-func gcd(a, b int) int {
+func Gcd(a, b int) int {
 	for b != 0 {
 		t := b
 		b = a % b
@@ -44,13 +44,13 @@ func gcd(a, b int) int {
 	return a
 }
 
-func lcm(integers ...int) int {
+func Lcm(integers ...int) int {
 	a := integers[0]
 	b := integers[1]
-	result := a * b / gcd(a, b)
+	result := a * b / Gcd(a, b)
 
 	for i := 2; i < len(integers); i++ {
-		result = lcm(result, integers[i])
+		result = Lcm(result, integers[i])
 	}
 
 	return result
@@ -74,7 +74,7 @@ func SolveD8P2Loop(moves string, network map[string][]string, ogLocations []stri
 		}
 	}
 
-	fmt.Println("Part 2 (loop):", lcm(stepCounts...), time.Since(start))
+	fmt.Println("Part 2 (loop):", Lcm(stepCounts...), time.Since(start))
 }
 
 func SolveD8P2GoRoutine(moves string, network map[string][]string, ogLocations []string) {
@@ -103,7 +103,7 @@ func SolveD8P2GoRoutine(moves string, network map[string][]string, ogLocations [
 	}
 
 	wg.Wait()
-	fmt.Println("Part 2 (goroutine):", lcm(stepCounts...), time.Since(start))
+	fmt.Println("Part 2 (goroutine):", Lcm(stepCounts...), time.Since(start))
 }
 
 var day8Cmd = &cobra.Command{
