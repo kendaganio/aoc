@@ -104,9 +104,10 @@ type ModuleInstruction struct {
 
 func SolveD20P1(modmap ModuleMap) (total int) {
 	counts := make(map[Pulse]int)
+	cycles := make(map[string]int)
 
-	for i := 0; i < 1000; i++ {
-		// button
+	i := 1
+	for {
 		modmap["broadcaster"].Receive("button", Low)
 		counts[Low]++
 		p, targets := modmap["broadcaster"].Send()
@@ -119,6 +120,15 @@ func SolveD20P1(modmap ModuleMap) (total int) {
 			ins := instructions[0]
 			instructions = instructions[1:]
 
+			if ins.P == High && (ins.Src == "js" || ins.Src == "qs" || ins.Src == "dt" || ins.Src == "ts") {
+				cycles[ins.Src] = i
+			}
+
+			if len(cycles) == 4 {
+				fmt.Println("Part 2:", Lcm(maps.Values(cycles)...))
+				return
+			}
+
 			for _, dst := range ins.Dst {
 				counts[ins.P]++
 
@@ -129,42 +139,9 @@ func SolveD20P1(modmap ModuleMap) (total int) {
 				}
 			}
 		}
-	}
 
-	return counts[Low] * counts[High]
-}
-
-func SolveD20P2(modmap ModuleMap) (total int) {
-	i := 1
-	counts := make(map[string]int)
-
-	for {
-		modmap["broadcaster"].Receive("button", Low)
-		p, targets := modmap["broadcaster"].Send()
-
-		instructions := []ModuleInstruction{
-			{p, "broadcaster", targets},
-		}
-
-		for len(instructions) > 0 {
-			ins := instructions[0]
-			instructions = instructions[1:]
-
-			if ins.P == High && (ins.Src == "js" || ins.Src == "qs" || ins.Src == "dt" || ins.Src == "ts") {
-				counts[ins.Src] = i
-			}
-
-			if len(counts) == 4 {
-				return Lcm(maps.Values(counts)...)
-			}
-
-			for _, dst := range ins.Dst {
-				if mod, ok := modmap[dst]; ok {
-					mod.Receive(ins.Src, ins.P)
-					p, targets := mod.Send()
-					instructions = append(instructions, ModuleInstruction{p, dst, targets})
-				}
-			}
+		if i == 1000 {
+			fmt.Println("Part 1:", counts[Low]*counts[High])
 		}
 
 		i++
@@ -230,13 +207,9 @@ var day20Cmd = &cobra.Command{
 			}
 		}
 
-		// start := time.Now()
-		// a := SolveD20P1(modmap)
-		// fmt.Println("Part 1:", a, time.Since(start))
-
 		start := time.Now()
-		b := SolveD20P2(modmap)
-		fmt.Println("Part 2:", b, time.Since(start))
+		SolveD20P1(modmap)
+		fmt.Println(time.Since(start))
 	},
 }
 
